@@ -1,0 +1,21 @@
+---
+- name: Configure prod server
+  hosts: app
+  become: true
+
+  tasks:
+    - name: Copy deploy.sh
+      copy:
+        src: ../scripts/deploy.sh
+        dest: /opt/flightlogscan/bin/deploy.sh
+        owner: gha
+        group: gha
+        mode: '0755'
+
+    - name: Deploy .env file securely
+      copy:
+        src: ../secrets/flightlogscan.env
+        dest: /etc/flightlogscan.env
+        owner: gha
+        group: gha
+        mode: '0600'

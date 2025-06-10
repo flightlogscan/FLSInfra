@@ -1,0 +1,39 @@
+package_update: true
+package_upgrade: true
+
+users:
+  - name: gha
+    groups: [sudo, docker]
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+
+packages:
+  - openjdk-21-jdk
+  - docker.io
+  - caddy
+  - curl
+  - unzip
+
+write_files:
+  - path: /etc/caddy/Caddyfile
+    owner: root:root
+    permissions: '0644'
+    content: |
+      api.flightlogscan.com {
+          reverse_proxy localhost:8080
+      }
+
+      http://api.flightlogscan.com {
+          redir https://{host}{uri} permanent
+      }y
+
+run cmd:
+  - systemctl enable --now docker
+  - mkdir -p /var/log/FLTSpring
+  - chown gha:gha /var/log/FLTSpring
+  - chmod 755 /var/log/FLTSpring
+  - touch /etc/flightlogscan.env
+  - chown gha:gha /etc/flightlogscan.env
+  - chmod 600 /etc/flightlogscan.env
+  - systemctl reload caddy
+  - systemctl disable --now ssh
