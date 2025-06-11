@@ -1,4 +1,4 @@
-name: Deploy Infra
+name: Deploy FLS Infra
 
 on:
   push:
@@ -16,6 +16,7 @@ jobs:
 
     env:
       TF_VAR_hcloud_token: ${{ secrets.HCLOUD_TOKEN }}
+      TF_VAR_github_runner_token: ${{ secrets.GITHUB_RUNNER_TOKEN }}
 
     steps:
       - name: Checkout code
@@ -26,16 +27,40 @@ jobs:
         with:
           terraform_version: 1.7.5
 
+      - name: Terraform Format Check
+        run: terraform -chdir=terraform fmt -check
+
       - name: Terraform Init
         run: terraform -chdir=terraform init
 
+      - name: Terraform Plan
+        run: |
+          terraform -chdir=terraform plan -out=tfplan
+          terraform -chdir=terraform show -json tfplan > plan.json
+
+      - name: Check for Server Changes
+        id: changes
+        run: |
+          if jq -e '.resource_changes[] | select(.type == "hcloud_server" and .change.actions | index("create"))' plan.json; then
+            echo "server_change=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "server_change=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Terraform Apply
-        run: terraform -chdir=terraform apply -auto-approve
+        if: steps.changes.outputs.server_change == 'true'
+        run: terraform -chdir=terraform apply -auto-approve tfplan
+
+      - name: Get latest SHA from app repo
+        id: app_sha
+        run: |
+          SHA=$(curl -s https://api.github.com/repos/flightlogscan/FLTSpring/commits/main | jq -r '.sha')
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
 
       - name: Trigger App Deploy
-        if: success()
+        if: steps.changes.outputs.server_change == 'true'
         run: |
           curl -X POST https://api.github.com/repos/flightlogscan/FLTSpring/dispatches \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.APP_REPO_PAT }}" \
-            -d '{"event_type":"infra_updated"}'
+            -d '{"event_type":"infra_updated", "client_payload":{"sha":"${{ steps.app_sha.outputs.sha }}"}}'

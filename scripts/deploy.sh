@@ -55,7 +55,7 @@ docker run -d \
     --restart unless-stopped \
     -p $PORT:8080 \
     -v /var/log/FLTSpring:/var/log/FLTSpring \
-    flightlogscanner/flightlogscan:$IMAGE_TAG
+    flightlogscanner/flightlogscan:"$IMAGE_TAG"
 
 log "Starting health check (timeout: ${TIMEOUT}s)..."
 start_time=$(date +%s)
