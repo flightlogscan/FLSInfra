@@ -1,1 +1,41 @@
+name: Deploy Infra
 
+on:
+  push:
+    paths:
+      - 'terraform/**'
+      - 'cloud-init/**'
+      - 'scripts/**'
+      - '.github/workflows/infra.yml'
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    name: Provision Infra
+    runs-on: ubuntu-latest
+
+    env:
+      TF_VAR_hcloud_token: ${{ secrets.HCLOUD_TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Terraform Init
+        run: terraform -chdir=terraform init
+
+      - name: Terraform Apply
+        run: terraform -chdir=terraform apply -auto-approve
+
+      - name: Trigger App Deploy
+        if: success()
+        run: |
+          curl -X POST https://api.github.com/repos/flightlogscan/FLTSpring/dispatches \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.APP_REPO_PAT }}" \
+            -d '{"event_type":"infra_updated"}'
