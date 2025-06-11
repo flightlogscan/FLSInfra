@@ -25,15 +25,17 @@ write_files:
 
       http://api.flightlogscan.com {
           redir https://{host}{uri} permanent
-      }y
+      }
+  - path: /opt/flightlogscan/bin/deploy.sh
+    owner: gha:gha
+    permissions: '0755'
+    content: |
+      ${deploy_script}
 
 run cmd:
   - systemctl enable --now docker
   - mkdir -p /var/log/FLTSpring
   - chown gha:gha /var/log/FLTSpring
   - chmod 755 /var/log/FLTSpring
-  - touch /etc/flightlogscan.env
-  - chown gha:gha /etc/flightlogscan.env
-  - chmod 600 /etc/flightlogscan.env
   - systemctl reload caddy
   - systemctl disable --now ssh
