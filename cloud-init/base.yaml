@@ -35,7 +35,6 @@ write_files:
     owner: gha:gha
     permissions: '0600'
     content: |
-      GITHUB_REPO=flightlogscan/FLTSpring
       GITHUB_TOKEN=${github_runner_token}
 
 run cmd:
@@ -49,6 +48,6 @@ run cmd:
   - curl -O -L https://github.com/actions/runner/releases/download/v2.315.0/actions-runner-linux-x64-2.315.0.tar.gz
   - tar xzf actions-runner-linux-x64-2.315.0.tar.gz
   - ./bin/installdependencies.sh
-  - source /etc/github_runner.env && ./config.sh --unattended --url https://github.com/${GITHUB_REPO} --token ${GITHUB_TOKEN} --labels hetzner --name $(hostname)
+  - source /etc/github_runner.env && ./config.sh --unattended --url https://github.com/flightlogscan/FLTSpring --token ${GITHUB_TOKEN} --labels hetzner --name $(hostname)
   - ./svc.sh install
   - ./svc.sh start
