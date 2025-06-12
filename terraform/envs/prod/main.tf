@@ -28,7 +28,7 @@ resource "hcloud_server" "prod" {
     ipv6_enabled = true
   }
   user_data = templatefile("${path.module}/../../cloud-init/base.yaml", {
-    deploy_script       = file("${path.module}/../../scripts/deploy.sh")
+    deploy_script       = file("${path.root}/scripts/deploy.sh")
     github_runner_token = var.github_runner_token
   })
 }
