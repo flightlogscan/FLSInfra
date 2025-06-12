@@ -2,7 +2,6 @@
 set -euo pipefail
 
 # Configuration
-ENV_FILE="/etc/flightlogscan.env"
 PORT=8080
 TIMEOUT=60  # Max seconds to wait for health check
 INTERVAL=5  # Seconds between health check retries
@@ -13,20 +12,11 @@ log() {
 
 log "Starting deployment on server..."
 
-if ! test -f "$ENV_FILE"; then
-    log "ERROR: Environment file $ENV_FILE not found"
-    exit 1
-fi
-
-if ! test -r "$ENV_FILE"; then
-    log "ERROR: Environment file $ENV_FILE is not readable"
-    exit 1
-fi
-
 IMAGE_TAG="$1"
-if [ -z "$IMAGE_TAG" ]; then
-    log "ERROR: No image tag provided."
-    log "Usage: $0 <image-tag>"
+API_TOKEN="$2"
+if [ -z "$IMAGE_TAG" ] || [ -z "$API_TOKEN" ]; then
+    log "ERROR: No image tag or API token provided."
+    log "Usage: $0 <image-tag> <api-token>"
     exit 1
 fi
 log "Pulling image flightlogscanner/flightlogscan:\"$IMAGE_TAG\" from Docker Hub..."
@@ -50,7 +40,7 @@ chmod 777 /var/log/FLTSpring
 log "Starting new container with image tag $IMAGE_TAG..."
 docker run -d \
     --platform linux/amd64 \
-    --env-file "$ENV_FILE" \
+    -e API_TOKEN="$API_TOKEN" \
     --name flightlogscan \
     --restart unless-stopped \
     -p $PORT:8080 \
