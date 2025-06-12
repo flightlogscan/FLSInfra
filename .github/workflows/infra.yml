@@ -64,3 +64,30 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.APP_REPO_PAT }}" \
             -d '{"event_type":"infra_updated", "client_payload":{"sha":"${{ steps.app_sha.outputs.sha }}"}}'
+
+  aws_terraform:
+    name: Provision AWS Route53/IAM
+    runs-on: ubuntu-latest
+    needs: terraform
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Terraform Init
+        run: terraform -chdir=terraform/envs/aws init
+
+      - name: Terraform Plan
+        run: |
+          terraform -chdir=terraform/envs/aws plan -out=tfplan
+          terraform -chdir=terraform/envs/aws show -json tfplan > plan.json
+
+      - name: Terraform Apply
+        run: terraform -chdir=terraform/envs/aws apply -auto-approve tfplan
