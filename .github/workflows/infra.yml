@@ -16,11 +16,20 @@ jobs:
 
     env:
       TF_VAR_hcloud_token: ${{ secrets.HCLOUD_TOKEN }}
-      TF_VAR_github_runner_token: ${{ secrets.GITHUB_RUNNER_TOKEN }}
+      TF_VAR_github_runner_token: ${{ steps.get_token.outputs.token }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Get GitHub Runner Token
+        id: get_token
+        run: |
+          TOKEN=$(curl -s -X POST \
+            -H "Authorization: Bearer ${{ secrets.APP_REPO_PAT }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/flightlogscan/FLTSpring/actions/runners/registration-token | jq -r .token)
+          echo "token=$TOKEN" >> $GITHUB_OUTPUT
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3

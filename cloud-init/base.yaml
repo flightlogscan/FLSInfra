@@ -48,6 +48,6 @@ run cmd:
   - curl -O -L https://github.com/actions/runner/releases/download/v2.315.0/actions-runner-linux-x64-2.315.0.tar.gz
   - tar xzf actions-runner-linux-x64-2.315.0.tar.gz
   - ./bin/installdependencies.sh
-  - source /etc/github_runner.env && ./config.sh --unattended --url https://github.com/flightlogscan/FLTSpring --token ${GITHUB_TOKEN} --labels hetzner --name $(hostname)
+  - source /etc/github_runner.env && ./config.sh --unattended --url https://github.com/flightlogscan/FLTSpring --token ${github_runner_token} --labels hetzner --name $(hostname)
   - ./svc.sh install
   - ./svc.sh start
