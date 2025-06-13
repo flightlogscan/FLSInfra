@@ -53,7 +53,13 @@ jobs:
       - name: Check for Server Changes
         id: changes
         run: |
-          if jq -e '.resource_changes[] | select(.type == "hcloud_server" and .change.actions | index("create"))' plan.json; then
+          set -e
+          jq -e . plan.json > /dev/null  # Validate JSON early
+
+          if jq -e '
+            .resource_changes[]
+            | select(.type == "hcloud_server" and (.change | type == "object") and (.change.actions | index("create")))
+          ' plan.json > /dev/null; then
             echo "server_change=true" >> "$GITHUB_OUTPUT"
           else
             echo "server_change=false" >> "$GITHUB_OUTPUT"
