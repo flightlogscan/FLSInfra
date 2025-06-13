@@ -1,5 +1,6 @@
-data "hcloud_ssh_key" "gha" {
-  name = "gha-key"
+resource "hcloud_ssh_key" "gha" {
+  name       = "gha-key"
+  public_key = file("${path.module}/../modules/ssh/gha_ed25519.pub")
 }
 
 resource "hcloud_server" "prod" {
@@ -9,7 +10,7 @@ resource "hcloud_server" "prod" {
   location     = "ash"
   image        = "ubuntu-24.04"
   backups      = true
-  ssh_keys     = [data.hcloud_ssh_key.gha.name]
+  ssh_keys     = [hcloud_ssh_key.gha.id]
   firewall_ids = [hcloud_firewall.web.id]
   public_net {
     ipv4_enabled = true
