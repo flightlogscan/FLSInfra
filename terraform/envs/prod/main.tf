@@ -1,3 +1,9 @@
+locals {
+  deploy_script = file("${path.module}/../../../scripts/deploy.sh")
+  cloud_config  = file("${path.module}/../../../cloud-init/base.yaml")
+  config_hash   = sha1(join("", [local.deploy_script, local.cloud_config]))
+}
+
 resource "hcloud_ssh_key" "default" {
   name       = "gha-key"
   public_key = file("${path.module}/../../ssh/gha_ed25519.pub")
@@ -17,8 +23,9 @@ resource "hcloud_server" "prod" {
     ipv6_enabled = true
   }
   user_data = templatefile("${path.module}/../../../cloud-init/base.yaml", {
-    deploy_script       = file("${path.module}/../../../scripts/deploy.sh")
+    deploy_script       = local.deploy_script
     github_runner_token = var.github_runner_token
+    config_hash         = local.config_hash
   })
 }
 

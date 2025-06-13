@@ -40,12 +40,12 @@ data "aws_route53_zone" "main" {
 }
 
 resource "aws_route53_record" "prod_api" {
-  zone_id = data.aws_route53_zone.main.zone_id
-  name    = "api.flightlogscan.com"
-  type    = "A"
-  ttl     = 300
+  zone_id         = data.aws_route53_zone.main.zone_id
+  name            = "api.flightlogscan.com"
+  type            = "A"
+  ttl             = 300
   allow_overwrite = true
-  records = var.hetzner_server_ip_list
+  records         = var.hetzner_server_ip_list
 
   lifecycle {
     create_before_destroy = true

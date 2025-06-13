@@ -1,3 +1,5 @@
+#cloud-config
+# hash: ${config_hash}
 package_update: true
 package_upgrade: true
 
