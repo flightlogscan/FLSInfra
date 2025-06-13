@@ -45,4 +45,8 @@ resource "aws_route53_record" "prod_api" {
   type    = "A"
   ttl     = 300
   records = var.hetzner_server_ip_list
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
