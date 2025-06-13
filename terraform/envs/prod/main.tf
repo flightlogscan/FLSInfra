@@ -17,7 +17,8 @@ resource "hcloud_ssh_key" "default" {
 }
 
 resource "hcloud_server" "prod" {
-  name        = "prod-ash1-fls"
+  count       = var.server_count
+  name        = "prod-ash1-fls-${count.index}"
   server_type = "cpx11"
   location    = "ash"
   image       = "ubuntu-24.04"
