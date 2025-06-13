@@ -33,19 +33,10 @@ data "aws_route53_zone" "main" {
   private_zone = false
 }
 
-# Import Hetzner server IP from remote state
-data "terraform_remote_state" "hetzner" {
-  backend = "local"
-  config = {
-    path = "../hetzner/terraform.tfstate"
-  }
-}
-
-# Route53 record for prod API using remote state IP
 resource "aws_route53_record" "prod_api" {
   zone_id = data.aws_route53_zone.main.zone_id
   name    = "api.flightlogscan.com"
   type    = "A"
-  ttl     = 60
-  records = [data.terraform_remote_state.hetzner.outputs.prod_server_ipv4]
+  ttl     = 300
+  records = var.hetzner_server_ip_list
 }
