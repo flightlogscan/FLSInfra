@@ -1,16 +1,3 @@
-terraform {
-  required_providers {
-    hcloud = {
-      source  = "hetznercloud/hcloud"
-      version = "1.49.1"
-    }
-  }
-}
-
-provider "hcloud" {
-  token = var.hcloud_token
-}
-
 data "hcloud_ssh_key" "gha" {
   name = "gha-key"
 }

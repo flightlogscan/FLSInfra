@@ -1,10 +1,16 @@
 # IAM user for GitHub Actions to access AWS
 resource "aws_iam_user" "github_actions" {
   name = "github-actions"
+
+  tags = {
+    Purpose = "CI/CD GitHub Actions"
+  }
 }
 
 resource "aws_iam_access_key" "github_actions" {
   user = aws_iam_user.github_actions.name
+
+  depends_on = [aws_iam_user.github_actions]
 }
 
 resource "aws_iam_user_policy" "github_actions_policy" {
@@ -21,7 +27,7 @@ resource "aws_iam_user_policy" "github_actions_policy" {
           "route53:ListHostedZones",
           "route53:ListResourceRecordSets"
         ],
-        Resource = "*"
+        Resource = data.aws_route53_zone.main.arn
       }
     ]
   })
