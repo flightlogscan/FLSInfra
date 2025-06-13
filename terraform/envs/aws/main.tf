@@ -1,5 +1,5 @@
 module "aws_infra" {
-  source             = "../../modules/aws"
-  hetzner_state_path = "../../prod/terraform.tfstate"
-  domain_name        = "flightlogscan.com."
+  source                   = "../../modules/aws"
+  domain_name              = "flightlogscan.com."
+  hetzner_server_ip_list   = var.hetzner_server_ip_list
 }

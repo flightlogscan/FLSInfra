@@ -1,3 +1,3 @@
-output "prod_server_ipv4" {
-  value = hcloud_server.prod.ipv4_address
+output "prod_server_ipv4_list" {
+  value = [for s in hcloud_server.prod : s.ipv4_address]
 }

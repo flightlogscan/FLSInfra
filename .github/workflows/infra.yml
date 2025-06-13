@@ -71,6 +71,12 @@ jobs:
         env:
           TF_VAR_github_runner_token: ${{ steps.get_token.outputs.token }}
 
+      - name: Get Hetzner Server IPs
+        id: get_ip
+        run: |
+          ips=$(terraform -chdir=terraform/envs/prod output -json prod_server_ipv4_list)
+          echo "server_ips=$ips" >> "$GITHUB_OUTPUT"
+
       - name: Get latest SHA from app repo
         id: app_sha
         run: |
@@ -110,4 +116,4 @@ jobs:
           terraform -chdir=terraform/envs/aws show -json tfplan > plan.json
 
       - name: Terraform Apply
-        run: terraform -chdir=terraform/envs/aws apply -auto-approve tfplan
+        run: terraform -chdir=terraform/envs/aws apply -auto-approve -var='hetzner_server_ip_list=${{ needs.terraform.outputs.server_ips }}'
