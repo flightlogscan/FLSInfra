@@ -44,6 +44,7 @@ resource "aws_route53_record" "prod_api" {
   name    = "api.flightlogscan.com"
   type    = "A"
   ttl     = 300
+  allow_overwrite = true
   records = var.hetzner_server_ip_list
 
   lifecycle {
