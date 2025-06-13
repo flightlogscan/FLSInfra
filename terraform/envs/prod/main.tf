@@ -1,6 +1,6 @@
 resource "hcloud_ssh_key" "gha" {
   name       = "gha-key"
-  public_key = file("${path.module}/../../../modules/ssh/gha_ed25519.pub")
+  public_key = file("${path.root}/modules/ssh/gha_ed25519.pub")
 }
 
 resource "hcloud_server" "prod" {
