@@ -52,5 +52,6 @@ runcmd:
   - tar xzf actions-runner-linux-x64-2.315.0.tar.gz
   - ./bin/installdependencies.sh >> /var/log/cloud-init-debug.log 2>&1
   - source /etc/github_runner.env && ./config.sh --unattended --url https://github.com/flightlogscan/FLTSpring --token ${github_runner_token} --labels hetzner --name $(hostname) >> /var/log/cloud-init-debug.log 2>&1
+  - cd /actions-runner
   - ./svc.sh install
   - ./svc.sh start
