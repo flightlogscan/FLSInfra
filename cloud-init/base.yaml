@@ -38,6 +38,12 @@ write_files:
     permissions: '0600'
     content: |
       GITHUB_TOKEN=${github_runner_token}
+  - path: /etc/cron.d/fltspring_log_cleanup
+    owner: root:root
+    permissions: '0644'
+    content: |
+      # delete FLTSpring logs older than 30 days (runs daily at 00:00)
+      0 0 * * * gha find /var/log/FLTSpring -name "*.log" -mtime +30 -delete
 
 runcmd:
   - systemctl enable --now docker
