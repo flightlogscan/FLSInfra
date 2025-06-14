@@ -29,12 +29,12 @@ write_files:
           redir https://{host}{uri} permanent
       }
   - path: /opt/flightlogscan/bin/deploy.sh
-    owner: gha:gha
+    owner: root:root
     permissions: '0755'
     encoding: b64
     content: ${deploy_script_b64}
   - path: /etc/github_runner.env
-    owner: gha:gha
+    owner: root:root
     permissions: '0600'
     content: |
       GITHUB_TOKEN=${github_runner_token}
@@ -44,6 +44,7 @@ runcmd:
   - mkdir -p /var/log/FLTSpring
   - chown gha:gha /var/log/FLTSpring
   - chmod 755 /var/log/FLTSpring
+  - chown gha:gha /opt/flightlogscan/bin/deploy.sh /etc/github_runner.env
   - systemctl reload caddy
   - systemctl disable --now ssh
   - mkdir -p /actions-runner && cd /actions-runner
