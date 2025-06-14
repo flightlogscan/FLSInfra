@@ -77,7 +77,8 @@ jobs:
         if: steps.changes.outputs.server_change == 'true'
         id: app_sha
         run: |
-          SHA=$(curl -s https://api.github.com/repos/flightlogscan/FLTSpring/commits/main | jq -r '.sha')
+          SHA=$(curl -s -H "Authorization: Bearer ${{ secrets.APP_REPO_PAT }}" \
+            https://api.github.com/repos/flightlogscan/FLTSpring/commits/main | jq -r '.sha')
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
 
       - name: Trigger App Deploy
