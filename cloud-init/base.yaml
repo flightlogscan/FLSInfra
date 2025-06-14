@@ -48,6 +48,7 @@ runcmd:
   - systemctl reload caddy
   - systemctl disable --now ssh
   - mkdir -p /actions-runner && cd /actions-runner
+  - chown -R gha:gha /actions-runner
   - curl -O -L https://github.com/actions/runner/releases/download/v2.315.0/actions-runner-linux-x64-2.315.0.tar.gz
   - tar xzf actions-runner-linux-x64-2.315.0.tar.gz
   - ./bin/installdependencies.sh >> /var/log/cloud-init-debug.log 2>&1
