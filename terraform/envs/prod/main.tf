@@ -1,5 +1,6 @@
 locals {
   deploy_script = file("${path.module}/../../../scripts/deploy.sh")
+  deploy_script_b64 = base64encode(local.deploy_script)
   cloud_config  = file("${path.module}/../../../cloud-init/base.yaml")
   config_hash   = sha1(join("", [local.deploy_script, local.cloud_config]))
 }
@@ -23,7 +24,7 @@ resource "hcloud_server" "prod" {
     ipv6_enabled = true
   }
   user_data = templatefile("${path.module}/../../../cloud-init/base.yaml", {
-    deploy_script       = local.deploy_script
+    deploy_script_b64   = local.deploy_script_b64
     github_runner_token = var.github_runner_token
     config_hash         = local.config_hash
   })

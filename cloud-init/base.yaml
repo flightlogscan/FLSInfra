@@ -31,15 +31,15 @@ write_files:
   - path: /opt/flightlogscan/bin/deploy.sh
     owner: gha:gha
     permissions: '0755'
-    content: |
-      ${deploy_script}
+    encoding: b64
+    content: ${deploy_script_b64}
   - path: /etc/github_runner.env
     owner: gha:gha
     permissions: '0600'
     content: |
       GITHUB_TOKEN=${github_runner_token}
 
-run cmd:
+runcmd:
   - systemctl enable --now docker
   - mkdir -p /var/log/FLTSpring
   - chown gha:gha /var/log/FLTSpring
@@ -49,7 +49,7 @@ run cmd:
   - mkdir -p /actions-runner && cd /actions-runner
   - curl -O -L https://github.com/actions/runner/releases/download/v2.315.0/actions-runner-linux-x64-2.315.0.tar.gz
   - tar xzf actions-runner-linux-x64-2.315.0.tar.gz
-  - ./bin/installdependencies.sh
-  - source /etc/github_runner.env && ./config.sh --unattended --url https://github.com/flightlogscan/FLTSpring --token ${github_runner_token} --labels hetzner --name $(hostname)
+  - ./bin/installdependencies.sh >> /var/log/cloud-init-debug.log 2>&1
+  - source /etc/github_runner.env && ./config.sh --unattended --url https://github.com/flightlogscan/FLTSpring --token ${github_runner_token} --labels hetzner --name $(hostname) >> /var/log/cloud-init-debug.log 2>&1
   - ./svc.sh install
   - ./svc.sh start
