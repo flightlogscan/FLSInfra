@@ -1,9 +1,0 @@
-variable "domain_name" {
-  description = "The Route53 domain name to manage records for."
-  type        = string
-}
-
-variable "hetzner_server_ip_list" {
-  type        = list(string)
-  description = "List of Hetzner server IPv4 addresses passed from CI"
-}

@@ -21,8 +21,20 @@ resource "null_resource" "fail_if_empty" {
   }
 }
 
-module "aws_infra" {
-  source                 = "../../modules/aws"
-  domain_name            = "flightlogscan.com."
-  hetzner_server_ip_list = local.valid_ip_list
+data "cloudflare_zones" "selected" {
+  filter {
+    name   = "flightlogscan.com."
+    status = "active"
+  }
+}
+
+resource "cloudflare_record" "api" {
+  for_each = toset(local.valid_ip_list)
+
+  zone_id = data.cloudflare_zones.selected.zones[0].id
+  name    = "api"
+  type    = "A"
+  content = each.key
+  ttl     = 300
+  proxied = true
 }

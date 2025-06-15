@@ -12,32 +12,22 @@ users:
 packages:
   - openjdk-21-jdk
   - docker.io
-  - caddy
   - curl
   - unzip
 
 write_files:
-  - path: /etc/caddy/Caddyfile
-    owner: root:root
-    permissions: '0644'
-    content: |
-      api.flightlogscan.com {
-          reverse_proxy localhost:8080
-      }
-
-      http://api.flightlogscan.com {
-          redir https://{host}{uri} permanent
-      }
   - path: /opt/flightlogscan/bin/deploy.sh
     owner: root:root
     permissions: '0755'
     encoding: b64
     content: ${deploy_script_b64}
+
   - path: /etc/github_runner.env
     owner: root:root
     permissions: '0600'
     content: |
       GITHUB_TOKEN=${github_runner_token}
+
   - path: /etc/cron.d/fltspring_log_cleanup
     owner: root:root
     permissions: '0644'
@@ -47,15 +37,19 @@ write_files:
 
 runcmd:
   - systemctl enable --now docker
+
   - mkdir -p /var/log/FLTSpring
   - chown gha:gha /var/log/FLTSpring
   - chmod 755 /var/log/FLTSpring
+
   - chown gha:gha /opt/flightlogscan/bin/deploy.sh /etc/github_runner.env
-  - systemctl reload caddy
+
   - systemctl disable --now ssh
+
   - mkdir -p /actions-runner && cd /actions-runner
   - curl -O -L https://github.com/actions/runner/releases/download/v2.315.0/actions-runner-linux-x64-2.315.0.tar.gz
   - tar xzf actions-runner-linux-x64-2.315.0.tar.gz
+
   - chown -R gha:gha /actions-runner
   - ./bin/installdependencies.sh >> /var/log/cloud-init-debug.log 2>&1
   - sudo -u gha /actions-runner/config.sh --unattended --url https://github.com/flightlogscan/FLTSpring --token ${github_runner_token} --labels hetzner --name $(hostname)-$(uuidgen | cut -c1-6) >> /var/log/cloud-init-debug.log 2>&1
