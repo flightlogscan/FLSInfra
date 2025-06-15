@@ -37,4 +37,9 @@ resource "cloudflare_record" "api" {
   content = each.key
   ttl     = 1
   proxied = true
+  allow_overwrite = true
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
