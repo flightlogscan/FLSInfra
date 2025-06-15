@@ -35,6 +35,6 @@ resource "cloudflare_record" "api" {
   name    = "api"
   type    = "A"
   content = each.key
-  ttl     = 300
+  ttl     = 1
   proxied = true
 }
