@@ -52,7 +52,7 @@ write_files:
                 - localhost
               labels:
                 job: docker
-                host: ${HOSTNAME}
+                host: ${hostname}
                 __path__: /var/lib/docker/containers/*/*.log
 
 runcmd:

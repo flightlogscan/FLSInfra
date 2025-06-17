@@ -1,4 +1,5 @@
 locals {
+  instance_name     = "prod-ash1-fls"
   deploy_script     = file("${path.module}/../../../scripts/deploy.sh")
   deploy_script_b64 = base64encode(local.deploy_script)
   cloud_config      = file("${path.module}/../../../cloud-init/base.yaml")
@@ -12,7 +13,7 @@ resource "hcloud_ssh_key" "default" {
 
 resource "hcloud_server" "prod" {
   count        = var.server_count
-  name         = "prod-ash1-fls-${count.index}"
+  name         = "${local.instance_name}-${count.index}"
   server_type  = "cpx11"
   location     = "ash"
   image        = "ubuntu-24.04"
@@ -28,6 +29,7 @@ resource "hcloud_server" "prod" {
     github_runner_token  = var.github_runner_token
     config_hash          = local.config_hash
     grafana_loki_api_key = var.grafana_loki_api_key
+    hostname             = "${local.instance_name}-${count.index}"
   })
 }
 
