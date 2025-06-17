@@ -24,9 +24,10 @@ resource "hcloud_server" "prod" {
     ipv6_enabled = true
   }
   user_data = templatefile("${path.module}/../../../cloud-init/base.yaml", {
-    deploy_script_b64   = local.deploy_script_b64
-    github_runner_token = var.github_runner_token
-    config_hash         = local.config_hash
+    deploy_script_b64      = local.deploy_script_b64
+    github_runner_token    = var.github_runner_token
+    config_hash            = local.config_hash
+    grafana_loki_api_key   = var.grafana_loki_api_key
   })
 }
 

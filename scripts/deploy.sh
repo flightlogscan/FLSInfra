@@ -33,7 +33,6 @@ if lsof -i :$HOST_PORT; then
     exit 1
 fi
 
-
 log "Starting new container with image tag $IMAGE_TAG..."
 docker run -d \
     --platform linux/amd64 \

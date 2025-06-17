@@ -13,3 +13,8 @@ variable "server_count" {
   description = "Number of Hetzner servers to create"
   default     = 1
 }
+
+variable "grafana_loki_api_key" {
+  type        = string
+  description = "Grafana Loki API key for Promtail"
+}

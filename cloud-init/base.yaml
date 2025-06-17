@@ -28,19 +28,35 @@ write_files:
     content: |
       GITHUB_TOKEN=${github_runner_token}
 
-  - path: /etc/cron.d/fltspring_log_cleanup
+  - path: /etc/promtail.yaml
     owner: root:root
     permissions: '0644'
     content: |
-      # delete FLTSpring logs older than 30 days (runs daily at 00:00)
-      0 0 * * * gha find /var/log/FLTSpring -name "*.log" -mtime +30 -delete
+      server:
+        http_listen_port: 9080
+        grpc_listen_port: 0
+
+      positions:
+        filename: /tmp/positions.yaml
+
+      clients:
+        - url: https://logs-prod-036.grafana.net/loki/api/v1/push
+          basic_auth:
+            username: 1248591
+            password: ${grafana_loki_api_key}
+
+      scrape_configs:
+        - job_name: system
+          static_configs:
+            - targets:
+                - localhost
+              labels:
+                job: docker
+                host: ${HOSTNAME}
+                __path__: /var/lib/docker/containers/*/*.log
 
 runcmd:
   - systemctl enable --now docker
-
-  - mkdir -p /var/log/FLTSpring
-  - chown gha:gha /var/log/FLTSpring
-  - chmod 755 /var/log/FLTSpring
 
   - chown gha:gha /opt/flightlogscan/bin/deploy.sh /etc/github_runner.env
 
@@ -54,3 +70,7 @@ runcmd:
   - ./bin/installdependencies.sh >> /var/log/cloud-init-debug.log 2>&1
   - sudo -u gha /actions-runner/config.sh --unattended --url https://github.com/flightlogscan/FLTSpring --token ${github_runner_token} --labels hetzner --name $(hostname)-$(uuidgen | cut -c1-6) >> /var/log/cloud-init-debug.log 2>&1
   - sudo -u gha /actions-runner/run.sh
+
+  - curl -L -o /usr/local/bin/promtail https://github.com/grafana/loki/releases/download/v2.9.4/promtail-linux-amd64
+  - chmod +x /usr/local/bin/promtail
+  - promtail -config.file=/etc/promtail.yaml &
