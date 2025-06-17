@@ -33,19 +33,15 @@ if lsof -i :$HOST_PORT; then
     exit 1
 fi
 
-log "Ensuring host log directory /var/log/FLTSpring exists..."
-mkdir -p /var/log/FLTSpring
-# Ensure the log directory exists (permissions should be set during server provisioning)
-chmod 777 /var/log/FLTSpring
 
 log "Starting new container with image tag $IMAGE_TAG..."
 docker run -d \
     --platform linux/amd64 \
     -e API_TOKEN="$API_TOKEN" \
+    -e SPRING_PROFILES_ACTIVE=prod \
     --name flightlogscan \
     --restart unless-stopped \
     -p $HOST_PORT:$CONTAINER_PORT \
-    -v /var/log/FLTSpring:/var/log/FLTSpring \
     flightlogscanner/flightlogscan:"$IMAGE_TAG"
 
 log "Starting health check (timeout: ${TIMEOUT}s)..."
