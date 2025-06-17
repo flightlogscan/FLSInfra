@@ -31,12 +31,12 @@ data "cloudflare_zones" "selected" {
 resource "cloudflare_record" "api" {
   for_each = toset(local.valid_ip_list)
 
-  zone_id = data.cloudflare_zones.selected.zones[0].id
-  name    = "api"
-  type    = "A"
-  content = each.key
-  ttl     = 1
-  proxied = true
+  zone_id         = data.cloudflare_zones.selected.zones[0].id
+  name            = "api"
+  type            = "A"
+  content         = each.key
+  ttl             = 1
+  proxied         = true
   allow_overwrite = true
 
   lifecycle {
