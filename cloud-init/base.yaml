@@ -71,6 +71,7 @@ runcmd:
   - sudo -u gha /actions-runner/config.sh --unattended --url https://github.com/flightlogscan/FLTSpring --token ${github_runner_token} --labels hetzner --name $(hostname)-$(uuidgen | cut -c1-6) >> /var/log/cloud-init-debug.log 2>&1
   - sudo -u gha /actions-runner/run.sh
 
-  - curl -L -o /usr/local/bin/promtail https://github.com/grafana/loki/releases/download/v2.9.4/promtail-linux-amd64
-  - chmod +x /usr/local/bin/promtail
-  - promtail -config.file=/etc/promtail.yaml &
+  - curl -L -o /tmp/promtail.zip https://github.com/grafana/loki/releases/download/v2.9.4/promtail-linux-amd64.zip
+  - unzip /tmp/promtail.zip -d /tmp
+  - install -m 0755 /tmp/promtail-linux-amd64 /usr/local/bin/promtail
+  - /usr/local/bin/promtail -config.file=/etc/promtail.yaml &
